@@ -1,4 +1,4 @@
-name: Automation tasks
+name: Automations
 
 on:
   pull_request:
@@ -10,48 +10,48 @@ permissions:
 
 jobs:
   add-label:
-      runs-on: ubuntu-latest
-  
-      steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-  
-      - name: Add label based on comment
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const description = context.payload.pull_request.body;
-            if (!description) {
-              console.log('No description found');
-              return;
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Add label based on comment
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const description = context.payload.pull_request.body;
+          if (!description) {
+            console.log('No description found');
+            return;
+          }
+          const firstLine = description.split('\n')[0];
+          const match = firstLine.match(/^PULL REQUEST TYPE:\s*(.*)$/i);
+          
+          if (match) {
+            const pullRequestType = match[1].trim().toLowerCase();
+            let label;
+
+            switch (pullRequestType) {
+              case 'bug':
+                label = 'bug';
+                break;
+              case 'feature':
+                label = 'feature';
+                break;
+              case 'documentation':
+                label = 'documentation';
+                break;
+              default:
+                label = 'needs review';
             }
-            const firstLine = description.split('\n')[0];
-            const match = firstLine.match(/^PULL REQUEST TYPE:\s*(.*)$/i);
-            
-            if (match) {
-              const pullRequestType = match[1].trim().toLowerCase();
-              let label;
-  
-              switch (pullRequestType) {
-                case 'api':
-                  label = 'api';
-                  break;
-                case 'gpt':
-                  label = 'gpt';
-                  break;
-                case 'kql':
-                  label = 'kql';
-                  break;
-                default:
-                  label = 'no label found';
-              }
-  
-              github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.pull_request.number,
-                labels: [label]
-              });
-            } else {
-              console.log('No matching PULL REQUEST TYPE found');
-            }
+
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              labels: [label]
+            });
+          } else {
+            console.log('No matching PULL REQUEST TYPE found');
+          }
