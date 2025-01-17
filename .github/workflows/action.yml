@@ -33,17 +33,17 @@ jobs:
             let label;
 
             switch (pullRequestType) {
-              case 'bug':
-                label = 'bug';
+              case 'kql':
+                label = 'kql';
                 break;
-              case 'feature':
-                label = 'feature';
+              case 'gpt':
+                label = 'gpt';
                 break;
-              case 'documentation':
-                label = 'documentation';
+              case 'api':
+                label = 'api';
                 break;
               default:
-                label = 'needs review';
+                label = 'invalid';
             }
 
             github.rest.issues.addLabels({
